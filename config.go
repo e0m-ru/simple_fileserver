@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/AlecAivazis/survey/v2"
 )
 
 type netConfig struct {
@@ -38,16 +40,30 @@ func init() {
 	flag.StringVar(&CFG.net.Port, "p", "8080", "port for serve files")
 	flag.StringVar(&CFG.os.Uploads, "u", defaultUploads, "folder to save files")
 	flag.Parse()
-	fmt.Printf("Select network:")
+
 	networks := GetAllLocalIPs()
-	for i, a := range networks {
-		fmt.Println(i, ": ", a)
+	if len(networks) == 0 {
+		fmt.Println("⚠️ No local networks found")
+		return
 	}
-	var n int
-	fmt.Scan(&n)
-	fmt.Printf("Network: %v\n", n)
+
+	var selected string
+	prompt := &survey.Select{
+		Message:  "Select network:",
+		Options:  networks,
+		PageSize: 10, // сколько показывать за раз
+	}
+	err := survey.AskOne(prompt, &selected)
+	if err != nil {
+		fmt.Printf("Input error: %v\n", err)
+		return
+	}
+
+	fmt.Printf("✅ Selected: %s\n", selected)
+
 	CFG.net.SRV = &http.Server{
-		Addr: networks[n] + ":" + CFG.net.Port,
+		Addr: selected + ":" + CFG.net.Port,
 	}
+
 	os.MkdirAll(CFG.os.Uploads, 0755)
 }

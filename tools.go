@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os/exec"
+	"runtime"
 
 	"github.com/yeqown/go-qrcode/v2"
 	"github.com/yeqown/go-qrcode/writer/standard"
@@ -64,4 +66,21 @@ func qrCode() {
 	if err := qrc.Save(term); err != nil {
 		panic(err)
 	}
+}
+
+func openURL(url string) error {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "linux":
+		cmd = exec.Command("xdg-open", url)
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", url)
+	case "darwin":
+		cmd = exec.Command("open", url)
+	default:
+		return fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+	}
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+	return cmd.Start() // Start не блокирует выполнение, пока браузер открыт
 }

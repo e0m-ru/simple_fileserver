@@ -40,7 +40,10 @@ func main() {
 	}(sig, CFG.net.SRV, done)
 
 	fmt.Print("upload dir: ", CFG.os.Uploads+"\n")
-	fmt.Print("сервер запущен на http://", CFG.net.SRV.Addr+"\n")
+	fmt.Print("the fileserver is running on http://", CFG.net.SRV.Addr+"\n")
+	if err := openURL("http://" + CFG.net.SRV.Addr); err != nil {
+		fmt.Printf("❌ Error: %v\n", err)
+	}
 	if err := CFG.net.SRV.ListenAndServe(); err != nil {
 		log.Print(err)
 	}
