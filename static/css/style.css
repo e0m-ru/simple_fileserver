@@ -1,0 +1,28 @@
+        .drop-zone {
+            border: 2px dashed var(--bs-primary);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+        .drop-zone:hover {
+            border-color: var(--bs-primary);
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+
+        .drop-zone.active {
+            border-color: var(--bs-sucess);
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+
+        .drop-zone-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        #fileInput {
+            display: none;
+        }
