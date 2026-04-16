@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -37,8 +38,16 @@ func init() {
 	flag.StringVar(&CFG.net.Port, "p", "8080", "port for serve files")
 	flag.StringVar(&CFG.os.Uploads, "u", defaultUploads, "folder to save files")
 	flag.Parse()
+	fmt.Printf("Select network:")
+	networks := GetAllLocalIPs()
+	for i, a := range networks {
+		fmt.Println(i, ": ", a)
+	}
+	var n int
+	fmt.Scan(&n)
+	fmt.Printf("Network: %v\n", n)
 	CFG.net.SRV = &http.Server{
-		Addr: GetLocalIP() + ":" + CFG.net.Port,
+		Addr: networks[n] + ":" + CFG.net.Port,
 	}
 	os.MkdirAll(CFG.os.Uploads, 0755)
 }
