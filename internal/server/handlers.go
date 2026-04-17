@@ -1,4 +1,5 @@
-package main
+// Package server handles HTTP handlers and server logic
+package server
 
 import (
 	"encoding/json"
@@ -9,29 +10,30 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/e0m-ru/fileserver/internal/config"
 )
 
-func collectHandlers() (*http.ServeMux, error) {
+func CollectHandlers() (*http.ServeMux, error) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/api/upload", uploadHandler)
 	mux.HandleFunc("/api/files", filesHandler)
 	mux.HandleFunc("/api/delete", deleteHandler)
-	uploads := http.FileServer(http.Dir(CFG.os.Uploads))
+	uploads := http.FileServer(http.Dir(config.Config.Os.Uploads))
 	mux.Handle("/uploads/", http.StripPrefix("/uploads/", uploads))
-	staticHandler := http.FileServer(http.FS(staticFiles))
+	staticHandler := http.FileServer(http.FS(config.StaticFiles))
 	mux.Handle("/static/", staticHandler)
 	return mux, nil
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	err := CFG.os.TMPL.Execute(w, nil)
+	err := config.Config.Os.TMPL.Execute(w, nil)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,9 +58,9 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	// Create uploads directory if not exists
-	os.MkdirAll(CFG.os.Uploads, 0755)
+	os.MkdirAll(config.Config.Os.Uploads, 0755)
 	// Save file
-	dst, err := os.Create(filepath.Join(CFG.os.Uploads, handler.Filename))
+	dst, err := os.Create(filepath.Join(config.Config.Os.Uploads, handler.Filename))
 	if err != nil {
 		http.Error(w, "Failed to save file", http.StatusInternalServerError)
 		log.Print(err)
@@ -79,7 +81,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 func filesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	files, err := os.ReadDir(CFG.os.Uploads)
+	files, err := os.ReadDir(config.Config.Os.Uploads)
 	if err != nil {
 		if os.IsNotExist(err) {
 			json.NewEncoder(w).Encode([]string{})
@@ -109,7 +111,7 @@ func filesHandler(w http.ResponseWriter, r *http.Request) {
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed ASSA", http.StatusMethodNotAllowed)
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -131,7 +133,7 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath := filepath.Join(CFG.os.Uploads, filename)
+	filePath := filepath.Join(config.Config.Os.Uploads, filename)
 	err = os.Remove(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {

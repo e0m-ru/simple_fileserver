@@ -5,9 +5,9 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 cd "$PROJECT_ROOT"
 
 export CGO_ENABLED=0 GOARCH=amd64
-APP_NAME=$1
-MAIN_PATH="./cmd/main.go"
-BUILD_SCRIPT="$PROJECT_ROOT/cmd/build.sh"
+APP_NAME="fileserver"
+MAIN_PATH="./cmd/fileserver/main.go"
+BUILD_SCRIPT="$PROJECT_ROOT/build/build.sh"
 
 echo "Building for all platforms..."
 echo ""

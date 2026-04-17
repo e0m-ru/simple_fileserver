@@ -3,13 +3,13 @@ set -e
 
 # Использование: ./build.sh <GOOS> <APP_NAME> <MAIN_PATH> [UPX_FLAGS]
 # Примеры:
-#   ./build.sh linux fileserver ./cmd/main.go
-#   ./build.sh darwin fileserver ./cmd/main.go --force-macos
-#   ./build.sh windows fileserver ./cmd/main.go
+#   ./build.sh linux fileserver ./cmd/fileserver/main.go
+#   ./build.sh darwin fileserver ./cmd/fileserver/main.go --force-macos
+#   ./build.sh windows fileserver ./cmd/fileserver/main.go
 
 if [ $# -lt 3 ]; then
     echo "Usage: $0 <GOOS> <APP_NAME> <MAIN_PATH> [UPX_FLAGS]"
-    echo "Example: $0 linux fileserver ./cmd/main.go"
+    echo "Example: $0 linux fileserver ./cmd/fileserver/main.go"
     exit 1
 fi
 
